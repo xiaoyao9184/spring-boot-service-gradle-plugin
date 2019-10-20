@@ -31,6 +31,6 @@ task serciveRepackage(type: Copy) {
     from("${project.buildDir}/libs"){
         rename "${project.name}-${version}.jar(.*)", "${service.profile}/${project.name}.jar\$1"
     }
-    into "${project.buildDir}/services/all-in-one"
+    into "${project.buildDir}/services/multiple-platform"
 
 }

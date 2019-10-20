@@ -69,9 +69,10 @@ task winswRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
         //check batch script
         def batFile = new File("${service.templateDir}/winsw/winsw.bat")
         if (!batFile.exists()) {
+            batFile.parentFile.mkdirs()
             new URL("${service.downloadUrl}/template/winsw/winsw_${service.language}.bat")
+                    .with(true, { i -> println("Use winsw.bat from ${i}") })
                     .withInputStream{ i -> batFile.withOutputStream{ it << i }}
-                    .with{ i -> println("Use a winsw.xml from ${i}") }
         } else {
             println("Use a custom batch script instead of the default.")
         }
@@ -79,9 +80,10 @@ task winswRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
         //check .Net config
         def configFile = new File("${service.templateDir}/winsw/winsw.exe.config")
         if (!configFile.exists()) {
+            configFile.parentFile.mkdirs()
             new URL("${service.downloadUrl}/template/winsw/winsw.exe.config")
-                    .withInputStream{ i -> batFile.withOutputStream{ it << i }}
-                    .with{ i -> println("Use a winsw.xml from ${i}") }
+                    .with(true, { i -> println("Use winsw.exe.config from ${i}") })
+                    .withInputStream{ i -> configFile.withOutputStream{ it << i }}
         } else {
             println("Use a custom winsw.exe.config instead of the default.")
         }
@@ -89,9 +91,10 @@ task winswRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
         //check winsw xml config
         def xmlFile = new File("${service.templateDir}/winsw/winsw.xml.template")
         if (!xmlFile.exists()) {
+            xmlFile.parentFile.mkdirs()
             new URL("${service.downloadUrl}/template/winsw/winsw.xml.template")
-                    .withInputStream{ i -> batFile.withOutputStream{ it << i }}
-                    .with{ i -> println("Use a winsw.xml.template from ${i}") }
+                    .with(true, { i -> println("Use winsw.xml.template from ${i}") })
+                    .withInputStream{ i -> xmlFile.withOutputStream{ it << i }}
         } else {
             println("Use a custom winsw.xml.template instead of the default.")
         }

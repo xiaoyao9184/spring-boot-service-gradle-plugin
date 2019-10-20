@@ -48,9 +48,10 @@ task systemdRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
         //check bash script
         def shFile = new File("${service.templateDir}/systemd/systemd.sh")
         if (!shFile.exists()) {
+            shFile.parentFile.mkdirs()
             new URL("${service.downloadUrl}/template/systemd/systemd_${service.language}.sh")
+                    .with(true, { i -> println("Use systemd.sh from ${i}") })
                     .withInputStream{ i -> shFile.withOutputStream{ it << i }}
-                    .with{ i -> println("Use a winsw.xml from ${i}") }
         } else {
             println("Use a custom bash script instead of the default.")
         }
@@ -58,9 +59,10 @@ task systemdRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
         //check systemd service
         def serviceFile = new File("${service.templateDir}/systemd/systemd.service.template")
         if (!serviceFile.exists()) {
-            new URL("${service.downloadUrl}/template/systemd/winsw.service.template")
+            serviceFile.parentFile.mkdirs()
+            new URL("${service.downloadUrl}/template/systemd/systemd.service.template")
+                    .with(true, { i -> println("Use systemd.service.template from ${i}") })
                     .withInputStream{ i -> serviceFile.withOutputStream{ it << i }}
-                    .with{ i -> println("Use a systemd.service.template from ${i}") }
         } else {
             println("Use a custom systemd.service.template instead of the default.")
         }
