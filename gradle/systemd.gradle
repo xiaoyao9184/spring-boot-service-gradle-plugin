@@ -1,0 +1,70 @@
+//2019-10-20 init
+
+ext {
+    bootPackageTask = project.tasks.findByName('bootRepackage') ?
+            'bootRepackage' :
+            project.tasks.findByName('bootJar') ?
+                    'bootJar' :
+                    null
+    if(bootPackageTask == null){
+        throw new UnsupportedOperationException(
+                "Only support spring boot with jar package mode! \n" +
+                        "This means must include 'bootRepackage' or 'bootJar' task in project " + project.name)
+    }
+    service = [
+            profile: project.hasProperty("serviceProfile") ? serviceProfile :
+                    "prod",
+            language: project.hasProperty("serviceLanguage") ? serviceLanguage :
+                    'en_US',
+            downloadUrl: project.hasProperty("serviceTemplateGit") ? serviceTemplateGit :
+                    'https://raw.githubusercontent.com/xiaoyao9184/spring-boot-service-gradle-plugin/master',
+            templateDir: "${rootProject.rootDir}/.service",
+            buildDir: "${project.buildDir}/services"
+    ]
+    project.description = project.description ? project.description : project.name
+    service.systemdBuildDir = "${service.buildDir}/systemd-service/${service.profile}"
+}
+
+task systemdRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
+    group 'service'
+    description 'Repackage system service archives for linux system used systemd'
+
+    from("${project.buildDir}/libs"){
+        rename "${project.name}-${version}.jar(.*)", "${project.name}.jar\$1"
+    }
+    from("${service.templateDir}/systemd") {
+        include '**/*.template'
+        expand(version: version, service: service, project: project.properties)
+        rename '(.*).template', '$1'
+        rename '(.*)systemd(.*)', ('$1' + "${project.name}" + '$2')
+    }
+    from("${service.templateDir}/systemd") {
+        exclude '**/*.template'
+        rename '(.*)systemd(.*)', ('$1' + "${project.name}" + '$2')
+    }
+    into "${service.systemdBuildDir}"
+
+    doFirst {
+        //check bash script
+        def shFile = new File("${service.templateDir}/systemd/systemd.sh")
+        if (!shFile.exists()) {
+            new URL("${service.downloadUrl}/template/systemd/systemd_${service.language}.sh")
+                    .withInputStream{ i -> shFile.withOutputStream{ it << i }}
+                    .with{ i -> println("Use a winsw.xml from ${i}") }
+        } else {
+            println("Use a custom bash script instead of the default.")
+        }
+
+        //check systemd service
+        def serviceFile = new File("${service.templateDir}/systemd/systemd.service.template")
+        if (!serviceFile.exists()) {
+            new URL("${service.downloadUrl}/template/systemd/winsw.service.template")
+                    .withInputStream{ i -> serviceFile.withOutputStream{ it << i }}
+                    .with{ i -> println("Use a systemd.service.template from ${i}") }
+        } else {
+            println("Use a custom systemd.service.template instead of the default.")
+        }
+    }
+
+}
+

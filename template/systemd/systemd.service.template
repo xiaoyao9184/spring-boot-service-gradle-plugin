@@ -1,0 +1,12 @@
+[Unit]
+Description=${project.description}-${version}
+After=syslog.target
+
+[Service]
+User=root
+SuccessExitStatus=143
+ExecStart=/bin/bash -c "/usr/bin/java -jar /var/${project.name}/${version}/${project.name}.jar"
+WorkingDirectory=/var/${project.name}/${version}/
+
+[Install]
+WantedBy=multi-user.target

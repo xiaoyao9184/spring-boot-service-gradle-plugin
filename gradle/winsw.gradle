@@ -1,0 +1,101 @@
+//2019-10-20 init
+
+ext {
+    bootPackageTask = project.tasks.findByName('bootRepackage') ?
+            'bootRepackage' :
+            project.tasks.findByName('bootJar') ?
+                    'bootJar' :
+                    null
+    if(bootPackageTask == null){
+        throw new UnsupportedOperationException(
+                "Only support spring boot with jar package mode! \n" +
+                        "This means must include 'bootRepackage' or 'bootJar' task in project " + project.name)
+    }
+    service = [
+            netVersion: 'net4',
+            winswVersion: '2.3.0',
+            profile: project.hasProperty("serviceProfile") ? serviceProfile :
+                    "prod",
+            language: project.hasProperty("serviceLanguage") ? serviceLanguage :
+                    'en_US',
+            downloadUrl: project.hasProperty("serviceTemplateGit") ? serviceTemplateGit :
+                    'https://raw.githubusercontent.com/xiaoyao9184/spring-boot-service-gradle-plugin/master',
+            templateDir: "${rootProject.rootDir}/.service",
+            buildDir: "${project.buildDir}/services"
+    ]
+    project.description = project.description ? project.description : project.name
+    service.winswBuildDir = "${service.buildDir}/winsw-service/${service.profile}"
+}
+
+repositories {
+    maven {
+        url 'http://repo.jenkins-ci.org/releases/'
+    }
+}
+
+configurations {
+    winsw { transitive = false }
+}
+
+dependencies {
+    //WinSW
+    winsw("com.sun.winsw:winsw:${service.winswVersion}:${service.netVersion}@exe")
+}
+
+
+task winswRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
+    group 'service'
+    description 'Repackage system service archives for windows system used winsw'
+
+    from(configurations.winsw){
+        rename "winsw-${service.winswVersion}-${service.netVersion}.exe", "${project.name}.exe"
+    }
+    from("${project.buildDir}/libs"){
+        rename "${project.name}-${version}.jar(.*)", "${project.name}.jar\$1"
+    }
+    from("${service.templateDir}/winsw") {
+        include '**/*.template'
+        expand(version: version, service: service, project: project.properties)
+        rename '(.*).template', '$1'
+        rename '(.*)winsw(.*)', ('$1' + "${project.name}" + '$2')
+    }
+    from("${service.templateDir}/winsw") {
+        exclude '**/*.template'
+        rename '(.*)winsw(.*)', ('$1' + "${project.name}" + '$2')
+    }
+    into "${service.winswBuildDir}"
+
+    doFirst {
+        //check batch script
+        def batFile = new File("${service.templateDir}/winsw/winsw.bat")
+        if (!batFile.exists()) {
+            new URL("${service.downloadUrl}/template/winsw/winsw_${service.language}.bat")
+                    .withInputStream{ i -> batFile.withOutputStream{ it << i }}
+                    .with{ i -> println("Use a winsw.xml from ${i}") }
+        } else {
+            println("Use a custom batch script instead of the default.")
+        }
+
+        //check .Net config
+        def configFile = new File("${service.templateDir}/winsw/winsw.exe.config")
+        if (!configFile.exists()) {
+            new URL("${service.downloadUrl}/template/winsw/winsw.exe.config")
+                    .withInputStream{ i -> batFile.withOutputStream{ it << i }}
+                    .with{ i -> println("Use a winsw.xml from ${i}") }
+        } else {
+            println("Use a custom winsw.exe.config instead of the default.")
+        }
+
+        //check winsw xml config
+        def xmlFile = new File("${service.templateDir}/winsw/winsw.xml.template")
+        if (!xmlFile.exists()) {
+            new URL("${service.downloadUrl}/template/winsw/winsw.xml.template")
+                    .withInputStream{ i -> batFile.withOutputStream{ it << i }}
+                    .with{ i -> println("Use a winsw.xml.template from ${i}") }
+        } else {
+            println("Use a custom winsw.xml.template instead of the default.")
+        }
+    }
+
+}
+

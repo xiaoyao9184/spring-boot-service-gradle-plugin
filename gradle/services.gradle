@@ -1,0 +1,36 @@
+//2019-10-20 init
+
+//check already apply
+if (project.tasks.findByName('systemdRepackage')) {
+    println("Task 'systemdRepackage' already exist there is no need to apply from the github.")
+} else if(project.hasProperty("serviceTemplateGit")) {
+    apply from: "${serviceTemplateGit}/gradle/systemd.gradle"
+} else {
+    apply from: "https://raw.githubusercontent.com/xiaoyao9184/spring-boot-service-gradle-plugin/master/gradle/systemd.gradle"
+}
+if (project.tasks.findByName('winswRepackage')) {
+    println("Task 'winswRepackage' already exist there is no need to apply from the github.")
+} else if(project.hasProperty("serviceTemplateGit")) {
+    apply from: "${serviceTemplateGit}/gradle/winsw.gradle"
+} else {
+    apply from: "https://raw.githubusercontent.com/xiaoyao9184/spring-boot-service-gradle-plugin/master/gradle/winsw.gradle"
+}
+
+task serciveRepackage(type: Copy) {
+    group 'service'
+    description 'Repackage system service archives for multiple platforms system'
+    dependsOn 'systemdRepackage'
+    dependsOn 'winswRepackage'
+
+    from ("${project.buildDir}/services/systemd-service"){
+        exclude '**/*.jar*'
+    }
+    from ("${project.buildDir}/services/winsw-service"){
+        exclude '**/*.jar*'
+    }
+    from("${project.buildDir}/libs"){
+        rename "${project.name}-${version}.jar(.*)", "${service.profile}/${project.name}.jar\$1"
+    }
+    into "${project.buildDir}/services/all-in-one"
+
+}

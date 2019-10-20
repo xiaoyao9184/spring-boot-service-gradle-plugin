@@ -1,0 +1,12 @@
+<service>
+    <id>${project.name}</id>
+    <name>${project.name}</name>
+    <description>${project.description}-${version}</description>
+    <workingdirectory>%BASE%\</workingdirectory>
+    <logpath>%BASE%\logs</logpath>
+    <logmode>rotate</logmode>
+
+    <executable>java</executable>
+    <startargument>-Dspring.profiles.active=${profile}</startargument>
+    <startargument>-jar "${project.name}.jar"</startargument>
+</service>
