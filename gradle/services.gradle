@@ -16,7 +16,7 @@ if (project.tasks.findByName('winswRepackage')) {
     apply from: "https://raw.githubusercontent.com/xiaoyao9184/spring-boot-service-gradle-plugin/master/gradle/winsw.gradle"
 }
 
-task serciveRepackage(type: Copy) {
+task serviceRepackage(type: Copy) {
     group 'service'
     description 'Repackage system service archives for multiple platforms system'
     dependsOn 'systemdRepackage'
