@@ -14,8 +14,9 @@ ext {
     service = [
             netVersion: 'net4',
             winswVersion: '2.3.0',
-            profile: project.hasProperty("serviceProfile") ? serviceProfile :
-                    "prod",
+            profile: project.hasProperty("profile") ? profile :
+                    project.hasProperty("serviceProfile") ? serviceProfile :
+                        "prod",
             language: project.hasProperty("serviceLanguage") ? serviceLanguage :
                     'en_US',
             downloadUrl: project.hasProperty("serviceTemplateGit") ? serviceTemplateGit :
