@@ -8,5 +8,6 @@
 
     <executable>java</executable>
     <startargument>-Dspring.profiles.active=${service.profile}</startargument>
-    <startargument>-jar "${project.name}.jar"</startargument>
+    <startargument>-jar</startargument>
+    <startargument>${project.name}.jar</startargument>
 </service>
