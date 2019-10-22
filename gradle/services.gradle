@@ -34,3 +34,10 @@ task serviceRepackage(type: Copy) {
     into "${project.buildDir}/services/multiple-platform"
 
 }
+
+task deleteTemplate(type: Delete) {
+    group 'service'
+    description 'Delete system service archives path'
+
+    delete "${rootProject.rootDir}/.service"
+}
