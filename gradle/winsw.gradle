@@ -79,14 +79,14 @@ task winswRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
         }
 
         //check .Net config
-        def configFile = new File("${service.templateDir}/winsw/winsw.exe.config")
+        def configFile = new File("${service.templateDir}/winsw/winsw.exe.config.template")
         if (!configFile.exists()) {
             configFile.parentFile.mkdirs()
-            new URL("${service.downloadUrl}/template/winsw/winsw.exe.config")
-                    .with(true, { i -> println("Use winsw.exe.config from ${i}") })
+            new URL("${service.downloadUrl}/template/winsw/winsw.exe.config.template")
+                    .with(true, { i -> println("Use winsw.exe.config.template from ${i}") })
                     .withInputStream{ i -> configFile.withOutputStream{ it << i }}
         } else {
-            println("Use a custom winsw.exe.config instead of the default.")
+            println("Use a custom winsw.exe.config.template instead of the default.")
         }
 
         //check winsw xml config
