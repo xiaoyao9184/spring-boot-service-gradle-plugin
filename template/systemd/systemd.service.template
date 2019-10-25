@@ -5,8 +5,8 @@ After=syslog.target
 [Service]
 User=root
 SuccessExitStatus=143
-ExecStart=/bin/bash -c "/usr/bin/java -jar /var/${project.name}/${version}/${project.name}.jar"
-WorkingDirectory=/var/${project.name}/${version}/
+ExecStart=/bin/bash -c "/usr/bin/java -jar /var/${project.name}/${ service.profile == 'test' ? '' : version + "/" }${project.name}.jar"
+WorkingDirectory=/var/${project.name}/${ service.profile == 'test' ? '' : version + "/" }
 
 [Install]
 WantedBy=multi-user.target
