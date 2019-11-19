@@ -5,7 +5,7 @@ After=syslog.target
 [Service]
 User=root
 SuccessExitStatus=143
-ExecStart=/bin/bash -c "/usr/bin/java -jar /var/${rootProject.name}/${ service.profile == 'test' ? '' : version + "/" }${project.name}.jar"
+ExecStart=/bin/bash -c "/usr/bin/java -jar /var/${rootProject.name}/${ service.profile == 'test' ? '' : version + "/" }${project.name}.jar -Dspring.profiles.active=${service.profile}"
 WorkingDirectory=/var/${rootProject.name}/${ service.profile == 'test' ? '' : version + "/" }
 
 [Install]
