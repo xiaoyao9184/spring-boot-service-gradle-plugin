@@ -56,7 +56,7 @@ task winswRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
     }
     from("${service.templateDir}/winsw") {
         include '**/*.template'
-        expand(version: version, service: service, project: project.properties)
+        expand(version: version, service: service, project: project.properties, rootProject: rootProject.properties)
         rename '(.*).template', '$1'
         rename '(.*)winsw(.*)', ('$1' + "${project.name}" + '$2')
     }

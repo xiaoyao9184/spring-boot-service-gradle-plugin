@@ -35,7 +35,7 @@ task systemdRepackage(dependsOn: "${bootPackageTask}", type: Copy) {
     }
     from("${service.templateDir}/systemd") {
         include '**/*.template'
-        expand(version: version, service: service, project: project.properties)
+        expand(version: version, service: service, project: project.properties, rootProject: rootProject.properties)
         rename '(.*).template', '$1'
         rename '(.*)systemd(.*)', ('$1' + "${project.name}" + '$2')
     }
