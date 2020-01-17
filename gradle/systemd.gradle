@@ -12,6 +12,10 @@ ext {
                         "This means must include 'bootRepackage' or 'bootJar' task in project " + project.name)
     }
     service = [
+            //only systemd have this
+            rootName: project.hasProperty("overrideRootName") ? overrideRootName :
+                    "${rootProject.name}",
+
             profile: project.hasProperty("profile") ? profile :
                     project.hasProperty("serviceProfile") ? serviceProfile :
                         "prod",
