@@ -12,6 +12,7 @@ ext {
                         "This means must include 'bootRepackage' or 'bootJar' task in project " + project.name)
     }
     service = [
+            //TODO Abandoned
             //only systemd have this
             rootName: project.hasProperty("overrideRootName") ? overrideRootName :
                     "${rootProject.name}",
